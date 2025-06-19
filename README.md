@@ -8,10 +8,10 @@ This project is based on the [Frankfurter.dev](https://www.frankfurter.app/) cur
 
 ## Features
 
-- 💻 CLI usage for quick conversions  
-- 🖥️ Simple Tkinter GUI for visual interaction  
-- 🌐 Real-time exchange rates via Frankfurter API  
-- 🧪 Clean and minimal Python code — great for beginners  
+- CLI usage for quick conversions  
+- Simple Tkinter GUI for visual interaction  
+- Real-time exchange rates via Frankfurter API  
+- Clean and minimal Python code — great for beginners  
 
 ---
 
@@ -60,6 +60,6 @@ This is a learning project to practice:
 
 ---
 
-## 🙌 Acknowledgements
+## Acknowledgements
 
 Thanks to [Frankfurter.dev](https://www.frankfurter.app/) for providing the free and simple exchange rate API.
