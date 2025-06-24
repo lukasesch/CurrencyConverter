@@ -1,10 +1,10 @@
+#TODO: Check Textfield for proper format
+#TODO: Write exceptions
+
 import argparse
 import logging
 import requests
 import customtkinter
-
-def button_pressed():
-    print("Button gedrückt")
     
 def get_available_currencies():
     frankfurter_currencies_url = "https://api.frankfurter.dev/v1/currencies"
@@ -19,6 +19,24 @@ def get_available_currencies():
         logging.error(response.status_code)
         return None
     
+def get_conversion_rate(fromcurrency, tocurrency):
+    frankfurter_url = "https://api.frankfurter.dev/v1/latest"
+    parameters = {
+        "base": fromcurrency,
+        "symbols": tocurrency
+    }
+    response = requests.get(frankfurter_url, parameters)
+    logging.info(f"URL Aufruf gestartet an: {response.url}")
+    if response.status_code == 200:
+        data = response.json()
+        result = data["rates"][tocurrency]
+        logging.info(f"{response.status_code}: Konvertierungsrate: {result}")
+        return result
+    else:
+        logging.error(response.status_code)
+        return None
+
+    
 def argument_parser():
     argumentparser = argparse.ArgumentParser(description="Währungskonverter - Entweder alle drei Argumente (--amount, --fromcurrency, --tocurrency) "
                         "oder keines für GUI Oberfläche.")
@@ -32,26 +50,13 @@ def argument_parser():
 
 ## CLI USAGE
 def cli_access(args):
-    frankfurter_url = "https://api.frankfurter.dev/v1/latest"
-    parameters = {
-        "base": args.fromcurrency,
-        "symbols": args.tocurrency
-    }
     logging.info(f"Konvertiere {args.amount} {args.fromcurrency} nach {args.tocurrency}")
-    response = requests.get(frankfurter_url, parameters)
-    logging.info(f"URL Aufruf gestartet an: {response.url}")
-    if response.status_code == 200:
-        data = response.json()
-        result = data["rates"][args.tocurrency]
-        logging.info(f"{response.status_code}: Konvertierungsrate: {result}")
-    else:
-        logging.error(response.status_code)
-
-    converted_result = float(result) * args.amount
+    conversion_rate = get_conversion_rate(args.fromcurrency, args.tocurrency)
+    converted_result = float(conversion_rate) * args.amount
     print(f"{args.amount} {args.fromcurrency} sind zur Zeit umgerechnet {converted_result:.2f} {args.tocurrency}!")
 
 ## GUI USAGE    
-def gui_access():
+def gui_access():    
     root = customtkinter.CTk()
     root.geometry("450x170")
     root.title("Currency Converter")
@@ -71,12 +76,29 @@ def gui_access():
     tocurrency_cb = customtkinter.CTkComboBox(root, values=get_available_currencies())
     tocurrency_cb.set("EUR")
     tocurrency_cb.grid(row = 1, column = 1, padx = 5, pady=5)
+    result = ""
+    
+    # Interne Funktionen
+    def button_pressed():
+        calculate_result(
+            fromcurrency_cb.get(), 
+            amount.get(), 
+            tocurrency_cb.get(), 
+            get_conversion_rate(fromcurrency_cb.get(), tocurrency_cb.get())
+        )
+    
+    def calculate_result(fromcurrency, amount, tocurrency, conversionrate):
+        calculation = float(amount) * conversionrate
+        label.configure(text = f"{amount} {fromcurrency} sind umgerechnet {calculation:.2f} {tocurrency}")
+    
     button = customtkinter.CTkButton(root, text="Convert", command=button_pressed)
     button.grid(columnspan = 2, sticky = 'ew', row = 2, padx = 5, pady=5)
-    label = customtkinter.CTkLabel(master=root, text="CTkLabel")
+    label = customtkinter.CTkLabel(master=root, text=result)
     label.grid(columnspan = 2, sticky = 'ew', row = 3, padx = 5, pady=5)
         
     root.mainloop()
+    
+    
 
 # MAIN METHOD
 def main():
