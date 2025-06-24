@@ -64,10 +64,12 @@ def run_cli(args):
     logging.info(
         f"Konvertiere {args.amount} {args.fromcurrency} nach {args.tocurrency}"
     )
+    # Komma durch Punkt ersetzen und in float umwandeln
+    amount = float(str(args.amount).replace(",", "."))
     conversion_rate = get_conversion_rate(args.fromcurrency, args.tocurrency)
-    converted_result = float(conversion_rate) * args.amount
+    converted_result = conversion_rate * amount
     print(
-        f"{args.amount} {args.fromcurrency} sind zur Zeit umgerechnet {converted_result:.2f} {args.tocurrency}!"
+        f"{amount} {args.fromcurrency} sind zur Zeit umgerechnet {converted_result:.2f} {args.tocurrency}!"
     )
 
 
